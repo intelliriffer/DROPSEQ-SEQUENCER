@@ -41,6 +41,7 @@ public:
     int drop = 10;
     int drop_range = 0;
     bool instant_update = false;
+    bool clocked = true;
 
     int note = 60;
     int xpose = 0;

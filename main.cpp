@@ -60,6 +60,7 @@ void printAll(bool _clear);
 void printLane(int trk);
 void resync(bool force, bool print);
 void createBANK(string filename);
+bool isClocked = true;
 string basePath = "";
 
 // std::string FW(std::string label, int value, int max_digits);
@@ -190,22 +191,48 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * /*user
         handleClockMessage(message->at(0));
         return;
     }
+    if (typ == 0x90) // note on
+    {
+        if (!isClocked && started)
+        {
+            for (unsigned char i = 0; i < SEQS; i++)
+            {
+                long long us = getUS();
+                SQ[i].tick(tick, us);
+            }
+        }
+        else if (isClocked)
+        { // transpose
+            unsigned char note = message->at(1);
+
+            int oct = note < 60 ? -1 : 0;
+            oct = note >= 72 ? 1 : oct;
+            int xpose = (note % 12) + oct;
+            for (unsigned char i = 0; i < SEQS; i++)
+            {
+                SQ[i].xpose = xpose;
+            }
+        }
+
+        return;
+    }
 
     if (typ == 0xB0) // cc message
     {
+
         /*
 
-1-13 weight
-Drop Min 14
-Drop Range 15
-Enable 16
-Ch: 17
-RandOct:18
+    1-13 weight
+    Drop Min 14
+    Drop Range 15
+    Enable 16
+    Ch: 17
+    RandOct:18
 
 
-80+
-4 Gates,
-4 Divs
+    80+
+    4 Gates,
+    4 Divs
 
 
         */
@@ -226,11 +253,21 @@ RandOct:18
             }
             return;
         }
-        if (CC == 119)
+        if (CC == 109)
         {
             for (int i = 0; i < SEQS; i++)
             {
                 SQ[i].instant_update = limit(VAL, 0, 1);
+            }
+            return;
+        }
+        if (CC == 110) // note advance mode
+        {
+            isClocked = !limit(VAL, 0, 1);
+            for (unsigned char i = 0; i < SEQS; i++)
+            {
+                SQ[i].clocked = isClocked;
+                SQ[i].reset(true);
             }
             return;
         }
@@ -513,7 +550,8 @@ void handleClockMessage(unsigned char message)
 
 void pulse() // used to compute bpm and send clock message to sequencer for sync
 {
-    sendTicks();
+    if (isClocked)
+        sendTicks();
     tick += 1;
 
     const uint mSize = 12; // fill up averaging buffer before computing final bpm;

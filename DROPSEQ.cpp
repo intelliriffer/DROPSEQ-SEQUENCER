@@ -41,21 +41,19 @@ void DROPSEQ::tick(long long _tick, long long ts) // tick is a midi clock pulse 
     int div = this->getDiv();
     int step = _tick == 0 ? 0 : (_tick + 1) % ((24 * 4 / div));
 
-    if (step == 0) // valid timed step
+    if ((clocked && step == 0) || !clocked) // valid timed step
     {
         if (_step == 0 && this->dirty)
         {
-            // cout << "updaeting" << endl;
+
             this->updateSeq();
 
             this->RSEQ = this->SEQ;
             if (!this->SEQ.size())
                 return;
 
-            // cout << this->RSEQ.size() << " :" << this->SEQ.size() << endl;
             this->dirty = false;
         }
-        //= (_tick) / (24 * 4 / div);
 
         if (this->RSEQ.at(_step).ROOT < 12) // trig note (active)
         {
@@ -65,7 +63,8 @@ void DROPSEQ::tick(long long _tick, long long ts) // tick is a midi clock pulse 
             if (this->enabled)
             {
 
-                int note = this->RSEQ.at(_step).ROOT + (12 * this->RSEQ.at(_step).octave);
+                int note = this->RSEQ.at(_step).ROOT + (12 * this->RSEQ.at(_step).octave) + this->xpose;
+                ;
                 //        +this->xpose;
 
                 int mul = note > 127 ? -1 : 1;
