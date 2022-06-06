@@ -641,7 +641,8 @@ void pulse() // used to compute bpm and send clock message to sequencer for sync
     {
         sendClock(248);
     }
-    sendTicks();
+    if (isClocked)
+        sendTicks();
     tick += 1;
     if (extClock)
     {
