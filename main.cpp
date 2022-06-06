@@ -274,12 +274,12 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * /*user
         unsigned char cmd = CC % 20;
         if (CC == 39)
         { // BPM1
-            bpm1 = limit(VAL, 60, 120);
+            bpm1 = limit(VAL, 30, 127);
             intBPM = bpm1 + bpm2;
         }
         if (CC == 40)
         { // BPM1
-            bpm2 = limit(VAL, 0, 120);
+            bpm2 = limit(VAL, 0, 127);
             intBPM = bpm1 + bpm2;
             return;
         }

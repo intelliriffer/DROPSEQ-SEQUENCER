@@ -1,4 +1,4 @@
-# DropSEQ - You May Never Know What You Gonna Get.. v 0.1.1
+# DropSEQ - You May Never Know What You Gonna Get.. v 0.1.2
 **A unique Weight & Drop Based  Dynamic Midi Note Sequencer** for Akai Force, Akai MPC, Raspberry Pi and Max Osx (intel)
 
 ## Download Latest Binaries 0.1.1
