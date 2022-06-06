@@ -37,7 +37,7 @@ void sendTicks();
 void clear();
 bool velSense = true;
 bool receiveNotes = true;
-bool extClock = false;
+bool extClock = true;
 int bpm1 = 120;
 int bpm2 = 0;
 long long lastPulse = 0;
