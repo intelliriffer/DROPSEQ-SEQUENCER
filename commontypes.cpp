@@ -1,9 +1,10 @@
 #include "commontypes.h";
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 int getDrop(unsigned char dropMax, unsigned char dropMin);
 
-vector<NODE> getDropSeq(NODE *matrix, unsigned char dropMax, unsigned char dropMin, unsigned char octmin, unsigned char octmax)
+vector<NODE> getDropSeq(NODE *matrix, unsigned char rotate, unsigned char dropMax, unsigned char dropMin, unsigned char octmin, unsigned char octmax)
 {
     vector<NODE> S;
 
@@ -54,6 +55,9 @@ vector<NODE> getDropSeq(NODE *matrix, unsigned char dropMax, unsigned char dropM
             index = 0;
         }
     }
+    rotate = rotate > S.size() ? rotate % S.size() : rotate;
+    std::rotate(S.begin(), S.begin() + rotate, S.end());
+
     return S;
 }
 int getDrop(unsigned char dropMax, unsigned char dropMin)

@@ -17,14 +17,22 @@ void DROPSEQ::updateSeq()
 {
     try
     {
-        this->SEQ = getDropSeq(matrix, this->drop, this->drop_range, this->octmin, this->octmax);
+        this->SEQ = getDropSeq(matrix, this->rotate, this->drop, this->drop_range, this->octmin, this->octmax);
+        for (int i = 0; i != this->SEQ.size(); i++)
+        {
+            this->SEQ.at(i).velocity = getVel();
+        }
     }
     catch (...)
     {
         cout << "exception at update" << endl;
     }
     if (this->instant_update)
+    {
+
+        this->loopCount = 0;
         this->RSEQ = this->SEQ;
+    }
 
     this->dirty = true;
     this->_step = 0;
@@ -45,10 +53,16 @@ void DROPSEQ::tick(long long _tick, long long ts) // tick is a midi clock pulse 
     {
         if (_step == 0 && this->dirty)
         {
-
+            // cout << "dirty" << endl;
             this->updateSeq();
 
             this->RSEQ = this->SEQ;
+            this->loopCount = 0;
+            if (this->autoregen)
+            {
+                this->needsRefresh = true;
+            }
+
             if (!this->SEQ.size())
                 return;
 
@@ -74,7 +88,7 @@ void DROPSEQ::tick(long long _tick, long long ts) // tick is a midi clock pulse 
                 }
                 //    cout << note << " " << this->ch << endl;
 
-                this->sendNote(0x90, this->ch - 1, note, this->getVel()); // send note on
+                this->sendNote(0x90, this->ch - 1, note, this->RSEQ.at(_step).velocity); // send note on
                 this->lastNote = note;
 
                 try
@@ -92,10 +106,18 @@ void DROPSEQ::tick(long long _tick, long long ts) // tick is a midi clock pulse 
         }
 
         __lastpulse = ts;
+
         _step++;
 
         if (_step == this->RSEQ.size())
+        {
+            this->loopCount++;
+            if (this->autoregen != 0 && ((this->loopCount % this->autoregen) == 0))
+            {
+                this->dirty = true;
+            }
             _step = 0;
+        }
     }
 }
 void DROPSEQ::clock(long long ts) // triggered every 100 microseconds (1/10 ms)
@@ -283,6 +305,13 @@ void DROPSEQ::setWeight(int N, int weight)
     this->dirty = true;
     // cout << "weight " << weight << " was set for nt" << N << endl;
 }
+void DROPSEQ::doRotate(int r)
+{
+    if (this->rotate == r)
+        return;
+    this->rotate = this->limit(r, 0, 127);
+    this->updateSeq();
+}
 
 void DROPSEQ::setDrop(int drop)
 {
@@ -326,4 +355,22 @@ void DROPSEQ::print()
         cout << "exception at print" << endl;
     }
     cout << endl;
+}
+void DROPSEQ::regen()
+{
+    this->updateSeq();
+    this->RSEQ = this->SEQ;
+}
+
+void DROPSEQ::setVel(int vel)
+{
+    this->vel = vel;
+    this->updateSeq();
+    // this->dirty = true;
+}
+void DROPSEQ::setVelh(int vel)
+{
+    this->velh = vel;
+    this->updateSeq();
+    // this->dirty = true;
 }

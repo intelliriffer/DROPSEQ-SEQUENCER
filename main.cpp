@@ -119,6 +119,8 @@ int main()
     for (int i = 0; i < SEQS; i++) // initialize sequencer parameters
     {
         SQ[i].setPORT(midiOut);
+        // SQ[i].setRefreshHandler(&printAll);
+        //__hook(&DROPSEQ::refresh, SQ[i], &printAll);
     }
     SQ[0].ENABLE(true);
     // SQ[0].setDrop(10);
@@ -135,10 +137,21 @@ int main()
         long long us = getUS();
         if (started)
         {
+            bool needsRefresh = false;
 
             for (char i = 0; i < SEQS; i++)
             {
                 SQ[i].clock(us);
+                if (SQ[i].needsRefresh)
+                {
+                    needsRefresh = true;
+                    SQ[i].needsRefresh = false;
+                }
+            }
+            if (needsRefresh)
+            {
+                printAll(true);
+                needsRefresh = false;
             }
         }
 
@@ -338,12 +351,40 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * /*user
         }
         if (CC >= 101 && CC <= 104)
         {
-            SQ[CC - 101].vel = VAL;
+            SQ[CC - 101].setVel(VAL);
+            printAll(true);
             return;
         }
         if (CC >= 105 && CC <= 108)
         {
-            SQ[CC - 105].velh = VAL;
+            SQ[CC - 105].setVelh(VAL);
+            printAll(true);
+            return;
+        }
+        if (CC >= 111 && CC <= 114)
+        {
+            SQ[CC - 111].autoregen = limit(VAL, 0, 127);
+            return;
+        }
+        if (CC >= 115 && CC <= 118)
+        {
+            if (VAL % 2 != 0)
+            {
+                SQ[CC - 115].regen();
+                printAll(true);
+            }
+            return;
+        }
+        if (CC >= 59 && CC <= 60)
+        {
+            SQ[CC - 59].doRotate(VAL);
+            printAll(true);
+            return;
+        }
+        if (CC >= 89 && CC <= 90)
+        {
+            SQ[CC - 89].doRotate(VAL);
+            printAll(true);
             return;
         }
 

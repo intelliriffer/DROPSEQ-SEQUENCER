@@ -39,6 +39,8 @@ public:
     int div = 1;
     int gate = 65;
     int drop = 10;
+    int autoregen = 0;
+    long loopCount = 0;
     int drop_range = 0;
     bool instant_update = false;
     bool clocked = true;
@@ -53,6 +55,7 @@ public:
     int vel = 96;
     int velh = 0;
     int master = 3;
+    int rotate = 0;
 
     bool clockSync = true;
     bool enabled = false;
@@ -78,7 +81,14 @@ public:
     void setDrop(int drop);
     void setDropRange(int range);
     void setOctRange(int range);
+    void doRotate(int r);
     void setOctave(int o);
+    void setVel(int vel);
+    void setVelh(int vel);
+    bool needsRefresh = false;
+    void refresh();
+    void regen();
+    /* __event void refresh();*/
 
     int getDiv();
 
