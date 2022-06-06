@@ -3,6 +3,7 @@
  ***************************************************************** */
 #include "DROPSEQ.h"
 #include <unistd.h>
+#include <cmath>
 #include <sys/stat.h>
 #include <chrono>
 #include <iostream>
@@ -36,7 +37,7 @@ void sendTicks();
 void clear();
 bool velSense = true;
 bool receiveNotes = true;
-bool extClock = true;
+bool extClock = false;
 int bpm1 = 120;
 int bpm2 = 0;
 long long lastPulse = 0;
@@ -142,12 +143,20 @@ int main()
 
             if (!extClock) // generate pulse
             {
-                long long pulseUS = (60000 * 1000) / (BPM * 24);
-                if ((us - lastPulse >= pulseUS) || lastPulse == 0)
+                float pls = (60000 * 1000) / (BPM * 24);
+                long long pulseUS = round(pls);
+                long long diff = us - lastPulse;
+                if ((diff >= pulseUS) || lastPulse == 0)
                 {
+                    long correction = 0;
+                    if (lastPulse > 0)
+                    {
+                        correction = pls - diff;
+                        // float _bpm = (24 * diff)
+                    }
                     BPM = intBPM;
                     pulse();
-                    lastPulse = us;
+                    lastPulse = us + correction;
                 }
             }
 
