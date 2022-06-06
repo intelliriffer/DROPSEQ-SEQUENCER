@@ -2,7 +2,7 @@
 **A unique Weight & Drop Based  Dynamic Midi Note Sequencer** for Akai Force, Akai MPC, Raspberry Pi and Max Osx (intel)
 
 ## Download Latest Binaries 0.1.2b
-1. [Akai Force, Akai MPC & Raspberry Pi](https://mega.nz/file/F0IzWCJR#scBOQdwLkVwx-EUDX1vfDe0gPDAQQfMXrXSQfpOo1tQ)
+1. [Akai Force, Akai MPC & Raspberry Pi](https://mega.nz/file/MxZUDBab#q_Y-DaR6A_7jooWEtW4ApGE4DaDqPmIHTvV3i1LQFEs)
 
 
 ## Features
