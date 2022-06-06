@@ -11,6 +11,8 @@
 3. Different Note duration (Gate) / Channel…
 4. Different Sequences / Channel
 5. Auto Sequence Regeneration  / Channel
+6. Internal + External Clock Support.
+7. Full Midi Control **See Below for Midi Mapping.
 
 
 ## Concept
@@ -111,6 +113,14 @@ or if using Mockba/Kick Gen Mod, you can put in a launch script in their respect
     1.  CC: 115-118 for Ch 1-4
 14. **Instant Update**
     1. CC 109: (0-1) When On (1), Changes Are Applied instantly and Sequence is Regenerated. When Off(0) Changes Applied at the end of Current Sequence.
+15. **Clock Control**
+    1.  Use External Clock: CC: 100 (0-1) 
+        1.  When 0 Internal Clock will be used, and also sent out. Clock Must be started using Start / Stop CC: 80 (0-1)
+    2. Stop / Start Internal Clock : CC:80 Values (0-1)
+    3. BPM1: CC:39 Values (30-127)
+    4. BPM2: CC:40 Values (0-127)
+    5. Internal Clock BPM is Set to Values of BPM1 + BPM2 
+       1. So if BPM1 = 100 and BPM 2 = 40, The Actual BPM becomes: 140
 
 
 
