@@ -11,8 +11,6 @@
 3. Different Note duration (Gate) / Channel
 4. Different Sequences / Channel
 5. Auto Sequence Regeneration  / Channel
-6. 
-   
 
 
 ## Concept

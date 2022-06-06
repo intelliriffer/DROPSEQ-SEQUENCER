@@ -22,6 +22,7 @@ using std::chrono::seconds;
 using std::chrono::system_clock;
 void onMIDI(double deltatime, std::vector<unsigned char> *message, void * /*userData*/);
 void sendNote(unsigned char type, unsigned char ch, unsigned char note, unsigned char vel);
+void sendClock(unsigned char msg);
 void listInports();
 uint getinPort(std::string str);
 uint getOutPort(std::string str);
@@ -35,7 +36,12 @@ void sendTicks();
 void clear();
 bool velSense = true;
 bool receiveNotes = true;
+bool extClock = true;
+int bpm1 = 120;
+int bpm2 = 0;
+long long lastPulse = 0;
 float BPM = 120.00;
+int intBPM = 120;
 float syncDiv = 3;
 bool doSync = true;
 
@@ -130,8 +136,21 @@ int main()
     while (true) // the main loop
     {
         long long us = getUS();
+
         if (started)
         {
+
+            if (!extClock) // generate pulse
+            {
+                long long pulseUS = (60000 * 1000) / (BPM * 24);
+                if ((us - lastPulse >= pulseUS) || lastPulse == 0)
+                {
+                    BPM = intBPM;
+                    pulse();
+                    lastPulse = us;
+                }
+            }
+
             bool needsRefresh = false;
 
             for (char i = 0; i < SEQS; i++)
@@ -157,8 +176,10 @@ int main()
 }
 void printAll(bool _clear = true) // prints the sequence to console.
 {
+
     if (_clear)
         clear();
+
     cout << string(80, '*') << endl;
 
     cout << "        <<<  SEQUENCES  >>>  " << endl;
@@ -196,6 +217,7 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * /*user
 
     if (size == 1) // system realtime message
     {
+
         handleClockMessage(message->at(0));
         return;
     }
@@ -250,15 +272,22 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * /*user
         unsigned char ch = byte0 & 0x0F;
         unsigned char trk = CC / 20;
         unsigned char cmd = CC % 20;
+        if (CC == 39)
+        { // BPM1
+            bpm1 = limit(VAL, 60, 120);
+            intBPM = bpm1 + bpm2;
+        }
+        if (CC == 40)
+        { // BPM1
+            bpm2 = limit(VAL, 0, 120);
+            intBPM = bpm1 + bpm2;
+            return;
+        }
 
-        if (CC == 100 && VAL > 0 && VAL % 2 == 0)
+        if (CC == 100)
         {
-            for (unsigned char i = 0; i < SEQS; i++)
-            {
+            extClock = limit(VAL, 0, 1);
 
-                SQ[i].octave = 0;
-                SQ[i].xpose = 0;
-            }
             return;
         }
         if (CC == 109)
@@ -303,14 +332,19 @@ void onMIDI(double deltatime, std::vector<unsigned char> *message, void * /*user
 
             return;
         }
-        if (CC == 80) // autosync
+        if (CC == 80) // start stop
         {
+            if (extClock)
+                return;
+            if (VAL == 0 && started)
+            { // steop
 
-            /*for (unsigned char i = 0; i < SEQS; i++)
+                clockStop();
+            }
+            if (VAL == 1 & !started)
             {
-
-                //  SQ[i].autosync = limit(VAL, 0, 1);
-            }*/
+                clockStart();
+            }
 
             return;
         }
@@ -505,6 +539,12 @@ void sendNote(unsigned char type, unsigned char ch, unsigned char note, unsigned
     // cout << "Sending " << (int)note << " with value " << (int)vel << endl;
     midiOut->sendMessage(&messageOut);
 }
+void sendClock(unsigned char msg)
+{
+    std::vector<unsigned char> messageOut;
+    messageOut.push_back(msg);
+    midiOut->sendMessage(&messageOut);
+}
 
 int limit(int v, int min, int max)
 {
@@ -573,10 +613,12 @@ void handleClockMessage(unsigned char message)
     {
 
     case 248:
-        pulse();
+        if (extClock)
+            pulse();
         return;
     case 250:
-        clockStart();
+        if (extClock)
+            clockStart();
         return;
     case 252:
         clockStop();
@@ -586,31 +628,37 @@ void handleClockMessage(unsigned char message)
 
 void pulse() // used to compute bpm and send clock message to sequencer for sync
 {
-    if (isClocked)
-        sendTicks();
+    if (!extClock)
+    {
+        sendClock(248);
+    }
+    sendTicks();
     tick += 1;
-
-    const uint mSize = 12; // fill up averaging buffer before computing final bpm;
-    pulses.push_back(ms());
-    /* if (pulses.size() < mSize)
-         return;*/
-    if (pulses.size() > mSize)
+    if (extClock)
     {
-        pulses.erase(pulses.begin());
-    }
 
-    double avg = 0;
-    unsigned cnt = 0;
-    for (uint i = 1; i < pulses.size(); i++)
-    {
-        double msd = pulses.at(i) - pulses.at(i - 1);
-        double localavg = (60 / ((msd * 24) / 1000));
-        avg += localavg;
-        cnt++;
+        const uint mSize = 12; // fill up averaging buffer before computing final bpm;
+        pulses.push_back(ms());
+        /* if (pulses.size() < mSize)
+             return;*/
+        if (pulses.size() > mSize)
+        {
+            pulses.erase(pulses.begin());
+        }
+
+        double avg = 0;
+        unsigned cnt = 0;
+        for (uint i = 1; i < pulses.size(); i++)
+        {
+            double msd = pulses.at(i) - pulses.at(i - 1);
+            double localavg = (60 / ((msd * 24) / 1000));
+            avg += localavg;
+            cnt++;
+        }
+        float bpm = (avg / cnt);
+        BPM = bpm;
     }
-    float bpm = (avg / cnt);
-    BPM = bpm;
-    updateBPM(bpm);
+    updateBPM(BPM);
 }
 void clockStart()
 {
@@ -618,13 +666,18 @@ void clockStart()
     std::cout << "Clock Started"
               << "\n"
               << std::flush;
+    if (!extClock)
+        sendClock(250);
     tick = 0;
     sstep = 0;
+    lastPulse = 0;
     resync(true, true);
     started = true;
 }
 void clockStop()
 {
+    if (!extClock)
+        sendClock(252);
     std::cout << "Clock Stopped"
               << "\n"
               << std::flush;
