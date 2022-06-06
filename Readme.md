@@ -7,8 +7,8 @@
 
 ## Features
 1. 4 Independent Tracks (Channels)
-2. Differnt Time Diviosns / Channel
-3. Different Note duration (Gate) / Channel
+2. Different Time Divisions / Channel
+3. Different Note duration (Gate) / Channel…
 4. Different Sequences / Channel
 5. Auto Sequence Regeneration  / Channel
 
@@ -19,10 +19,10 @@ This Sequencer is Based on a **Subtractive Sequencer** concept a Fellow Akai For
 1. It consists of 12 Notes + Rest and you assign a weight to each note (value 0, note is not used, values 9-100, Note is used).
 2. At Each Pulse Step (Clock Division or Manual Trig),The Weights are evaluates and the Note with Maximum Weight is Chosen, ( . Silence for rest).
 3. If 2 or more notes share same weight, the First Note takes Priority.
-4. The User Specifed **DROP MAX** Value is is then Subtracted from this Note.
-5. This Process Repeates until Any of the Note Weights reaches value of 8.
+4. The User Specified **DROP MAX** Value is is then Subtracted from this Note.
+5. This Process Repeats until Any of the Note Weights reaches value of 8.
 6. All the Chosen Notes Thus Form a Sequence that will be Played.
-7. Through Various Other Paramter Ranges, The Algorithm will use a Random Value betwwen Min and Max Value provided.
+7. Through Various Other Parameter Ranges, The Algorithm will use a Random Value between Min and Max Value provided.
 
 **The Three Ranged parameters are :**
    1. **DropMax and DropMin**:  When Drop Min = 0, its Not Used. and only Drop Max is Used. Otherwise At Each Pulse, a Random Drop Value is Computed between Drop Max and Drop Min and Applied to that Particular note. This Can change Note order and Sequence dynamically.
@@ -32,10 +32,10 @@ This Sequencer is Based on a **Subtractive Sequencer** concept a Fellow Akai For
 ## Functions Explained
 
 1. ### Note Advance (Global)
-   The Sequecer Runs in 1 Modes:
+   The Sequencer Runs in 1 Modes:
    1. Clocked (0):
       1.  The Step in the Generated Sequence is Triggered (Note or Rest) for each in coming Clock Pulse (1/6, or 1/8 etc). 
-      2.  Bassed on Incoming Note a Transpose 1-11 is Appplied to The Sequence, Transpose Octave is Calulated base on Middle C (60) , values Below 60 will also transpose -1 octave, Values 72+ Transposes + octave. Giving you range of 3 octaves for transposition of the sequence.
+      2.  Based on Incoming Note a Transpose 1-11 is Applied to The Sequence, Transpose Octave is Calculated base on Middle C (60) , values Below 60 will also transpose -1 octave, Values 72+ Transposes + octave. Giving you range of 3 octaves for transposition of the sequence.
       
    2. Note Advance (0-1):
       1.  The Step in the Generated Sequence is Triggered by each Incoming Note On (Gate/Trig) Message, and is Advanced to Next Step. With this you can program your own Rhythms in Midi Clip.
