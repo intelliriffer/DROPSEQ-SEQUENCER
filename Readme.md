@@ -19,9 +19,9 @@
 This Sequencer is Based on a **Subtractive Sequencer** concept by a Fellow Akai Force User: **Steven Law**
 
 1. It consists of 12 Notes + Rest and you assign a weight to each note (value 0, note is not used, values 9-100, Note is used).
-2. At Each Pulse Step (Clock Division or Manual Trig),The Weights are evaluates and the Note with Maximum Weight is Chosen, ( . Silence for rest).
+2. At Each Pulse Step (Clock Division or Manual Trig),The Weights are evaluated and the Note with Maximum Weight is Chosen, ( . Silence for rest).
 3. If 2 or more notes share same weight, the First Note takes Priority.
-4. The User Specified **DROP MAX** Value is is then Subtracted from this Note.
+4. The User Specified **DROP MAX** Value is then Subtracted from this Note.
 5. This Process Repeats until Any of the Note Weights reaches value of 8.
 6. All the Chosen Notes Thus Form a Sequence that will be Played.
 7. Through Various Other Parameter Ranges, The Algorithm will use a Random Value between Min and Max Value provided.
@@ -34,13 +34,13 @@ This Sequencer is Based on a **Subtractive Sequencer** concept by a Fellow Akai 
 ## Functions Explained
 
 1. ### Note Advance (Global)
-   The Sequencer Runs in 1 Modes:
+   The Sequencer Runs in 2 Modes:
    1. Clocked (0):
       1.  The Step in the Generated Sequence is Triggered (Note or Rest) for each in coming Clock Pulse (1/6, or 1/8 etc). 
       2.  Based on Incoming Note a Transpose 1-11 is Applied to The Sequence, Transpose Octave is Calculated base on Middle C (60) , values Below 60 will also transpose -1 octave, Values 72+ Transposes + octave. Giving you range of 3 octaves for transposition of the sequence.
       
-   2. Note Advance (0-1):
-      1.  The Step in the Generated Sequence is Triggered by each Incoming Note On (Gate/Trig) Message, and is Advanced to Next Step. With this you can program your own Rhythms in Midi Clip.
+   2. Note Advance (1):
+      1.  The Step in the Generated Sequence is Triggered by each Incoming Note On (Gate/Trig) Message, and is Advanced to Next Step. With this you can program your own Rhythms in a Midi Clip.
       2. No Transpose is Applied in Note Advance Mode.
 
 2. ### Auto Regen Cycles
