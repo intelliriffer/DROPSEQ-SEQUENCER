@@ -109,7 +109,7 @@ or if using Mockba/Kick Gen Mod, you can put in a launch script in their respect
     1.  CC: 85-88 for Ch 1-4
 12. **Auto Regen Cycles** (0-127)
     1.  CC: 115-118 for Ch 1-4
-13. **Regen** (0-1) Recomputes and Restarts the Sequence.
+13. **Regen** (0-1) Recomputes and Restarts the Sequence. (any odd value)
     1.  CC: 115-118 for Ch 1-4
 14. **Instant Update**
     1. CC 109: (0-1) When On (1), Changes Are Applied instantly and Sequence is Regenerated. When Off(0) Changes Applied at the end of Current Sequence.

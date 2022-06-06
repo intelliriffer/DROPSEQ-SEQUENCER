@@ -123,13 +123,8 @@ int main()
         //__hook(&DROPSEQ::refresh, SQ[i], &printAll);
     }
     SQ[0].ENABLE(true);
-    // SQ[0].setDrop(10);
-    /*SQ[0].setWeight(3, 70);
-    SQ[0].setWeight(12, 50);
-    SQ[0].setWeight(7, 60);
-    SQ[0].setWeight(10, 65);
-    SQ[0].updateDiv(2);
-*/
+    SQ[0].setOctave(6);
+    SQ[0].setOctRange(4);
     printAll(false);
 
     while (true) // the main loop

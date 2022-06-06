@@ -48,8 +48,8 @@ public:
     int note = 60;
     int xpose = 0;
     int octave = 5;
-    unsigned char octmin = 4;
-    unsigned char octmax = 6;
+    unsigned char octmin = 5;
+    unsigned char octmax = 5;
     int octrand = 0;
 
     int vel = 96;
