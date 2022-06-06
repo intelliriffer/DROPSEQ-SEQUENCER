@@ -14,7 +14,7 @@
 
 
 ## Concept
-This Sequencer is Based on a **Subtractive Sequencer** concept a Fellow Akai Force User: **Steven Law**
+This Sequencer is Based on a **Subtractive Sequencer** concept by a Fellow Akai Force User: **Steven Law**
 
 1. It consists of 12 Notes + Rest and you assign a weight to each note (value 0, note is not used, values 9-100, Note is used).
 2. At Each Pulse Step (Clock Division or Manual Trig),The Weights are evaluates and the Note with Maximum Weight is Chosen, ( . Silence for rest).
