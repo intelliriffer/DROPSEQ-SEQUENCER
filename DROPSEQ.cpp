@@ -315,24 +315,32 @@ void DROPSEQ::doRotate(int r)
 
 void DROPSEQ::setDrop(int drop)
 {
+    if (this->drop == drop)
+        return;
     this->drop = this->limit(drop, 1, 50);
     this->updateSeq();
     // this->dirty = true;
 }
 void DROPSEQ::setDropRange(int range)
 {
+    if (this->drop_range == range)
+        return;
     this->drop_range = this->limit(range, 0, 50);
     this->updateSeq();
     // this->dirty = true;
 }
 void DROPSEQ::setOctRange(int range)
 {
+    if (this->octmin == range)
+        return;
     this->octmin = this->limit(range, 0, 8);
     this->updateSeq();
     // this->dirty = true;
 }
 void DROPSEQ::setOctave(int o)
 {
+    if (this->octmax == o)
+        return;
     this->octmax = this->limit(o, 0, 8);
     this->updateSeq();
     // this->dirty = true;

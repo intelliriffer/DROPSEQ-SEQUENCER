@@ -36,6 +36,7 @@ long long getUS();
 void sendTicks();
 void clear();
 bool velSense = true;
+bool bgprocess = false;
 bool receiveNotes = true;
 bool extClock = true;
 int bpm1 = 120;
@@ -80,8 +81,10 @@ RtMidiOut *midiOut = 0;
 const unsigned char SEQS = 4;
 
 DROPSEQ *SQ = new DROPSEQ[SEQS]; // creante the 8 track sequencer in an array
-int main()
+int main(int argc, char *argv[])
 {
+    bgprocess = argc > 1 && string(argv[1]) == "-v";
+
     srand(time(NULL));
     clear();
     char c[260];
@@ -120,8 +123,8 @@ int main()
         midiIn->openVirtualPort("DropSeq");
         midiOut->openVirtualPort("DropSeq");
     }
-
-    cout << "Ports opened - Waiting for Midi Clock Input to Start " << endl;
+    if (!bgprocess)
+        cout << "Ports opened - Waiting for Midi Clock Input to Start " << endl;
 
     for (int i = 0; i < SEQS; i++) // initialize sequencer parameters
     {
@@ -177,15 +180,22 @@ int main()
                 needsRefresh = false;
             }
         }
-
-        usleep(100); //        1ms loop
+        if (started)
+        {
+            usleep(100);
+        }
+        else
+        {
+            usleep(5000);
+        } //        1ms loop
     }
 
     return 0;
 }
 void printAll(bool _clear = true) // prints the sequence to console.
 {
-
+    if (bgprocess)
+        return;
     if (_clear)
         clear();
 
@@ -210,8 +220,11 @@ void printAll(bool _clear = true) // prints the sequence to console.
 }
 void clear()
 {
+    if (bgprocess)
+        return;
     // CSI[2J clears screen, CSI[H moves the cursor to top-left corner
-    cout << "\x1B[2J\x1B[H";
+    cout
+        << "\x1B[2J\x1B[H";
     cout << "  ************************************" << endl;
     cout << "  DropSeq  (Press Ctrl + C to Quit)" << endl;
     cout << "  ************************************" << endl;
@@ -672,10 +685,10 @@ void pulse() // used to compute bpm and send clock message to sequencer for sync
 }
 void clockStart()
 {
-
-    std::cout << "Clock Started"
-              << "\n"
-              << std::flush;
+    if (!bgprocess)
+        std::cout << "Clock Started"
+                  << "\n"
+                  << std::flush;
     if (!extClock)
         sendClock(250);
     tick = 0;
@@ -688,9 +701,10 @@ void clockStop()
 {
     if (!extClock)
         sendClock(252);
-    std::cout << "Clock Stopped"
-              << "\n"
-              << std::flush;
+    if (!bgprocess)
+        std::cout << "Clock Stopped"
+                  << "\n"
+                  << std::flush;
     started = false;
     resync(true, false);
 }
