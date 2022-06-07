@@ -59,6 +59,7 @@ const unsigned VEL_SENSE_MIN = 22;
 const unsigned VEL_SENSE_MAX = 127;
 unsigned char currSlot = 0;
 long long tick = 0;
+int SLEEP_UNIT = 5000; // 5ms
 
 vector<double> pulses;
 int limit(int v, int min, int max);
@@ -69,6 +70,7 @@ void printLane(int trk);
 void resync(bool force, bool print);
 void createBANK(string filename);
 bool isClocked = true;
+void setSleep();
 string basePath = "";
 
 // std::string FW(std::string label, int value, int max_digits);
@@ -180,14 +182,8 @@ int main(int argc, char *argv[])
                 needsRefresh = false;
             }
         }
-        if (started)
-        {
-            usleep(100);
-        }
-        else
-        {
-            usleep(5000);
-        } //        1ms loop
+
+        usleep(SLEEP_UNIT);
     }
 
     return 0;
@@ -696,6 +692,7 @@ void clockStart()
     lastPulse = 0;
     resync(true, true);
     started = true;
+    setSleep();
 }
 void clockStop()
 {
@@ -706,6 +703,7 @@ void clockStop()
                   << "\n"
                   << std::flush;
     started = false;
+    setSleep();
     resync(true, false);
 }
 
@@ -783,4 +781,14 @@ float getDiv(unsigned char d) // return midi time division 1/16,1/4 etc based on
         break;
     }
     return div;
+}
+
+void setSleep()
+{
+    if (started)
+    {
+        SLEEP_UNIT = 100;
+        return;
+    }
+    SLEEP_UNIT = 5000;
 }
